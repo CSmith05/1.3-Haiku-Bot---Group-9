@@ -23,4 +23,5 @@ syllabified_words = [syllabify(word) for word in words]
 syllabified_words = list(itertools.chain.from_iterable(syllabified_words))
 
 # Print the result
-print('','-'.join(syllabified_words[:5]),'\n','-'.join(syllabified_words[5:12]),'\n','-'.join(syllabified_words[12:16]))
+print('Full List:',syllabified_words[:17])
+print('Haiku:\n','-'.join(syllabified_words[:5]),'\n','-'.join(syllabified_words[5:12]),'\n','-'.join(syllabified_words[12:17]))
