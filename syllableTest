@@ -1,0 +1,14 @@
+import pyphen
+import pandas as pd
+# Create a Pyphen object for English
+dic = pyphen.Pyphen(lang='en')
+def syllabify(word):
+# Insert hyphens into the word to indicate syllable breaks
+     return dic.inserted(word).split('-')
+# List of custom words
+words = ['contest', 'conflict', 'construction', 'table', 'lion']
+# Apply syllabification to each word
+syllabified_words = [syllabify(word) for word in words]
+syllabified_words = [item for sublist in syllabified_words for item in sublist]
+# Print the result
+print(syllabified_words)
