@@ -1,4 +1,5 @@
 import pyphen
+import itertools
 import pandas as pd
 # Create a Pyphen object for English
 dic = pyphen.Pyphen(lang='en')
@@ -9,6 +10,6 @@ def syllabify(word):
 words = ['contest', 'conflict', 'construction', 'table', 'lion']
 # Apply syllabification to each word
 syllabified_words = [syllabify(word) for word in words]
-syllabified_words = [item for sublist in syllabified_words for item in sublist]
+syllabified_words = list(itertools.chain.from_iterable(syllabified_words))
 # Print the result
 print(syllabified_words)
