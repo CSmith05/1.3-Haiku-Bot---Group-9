@@ -1,35 +1,48 @@
 import feedparser
 import pyphen
 import itertools
+import syllables
 import pandas as pd
 import requests
 
-# Identify the target RSS feed (in this case BBC News) and create the variables
 rss_url = "http://feeds.bbci.co.uk/news/rss.xml"
 feed = feedparser.parse(rss_url)
-words = []
+alreadyChecked = []
 
-# Print the top 3 headlines and convert them into an array
-for entry in feed.entries[:3]:
-    words.append((entry.title).split())
-words = list(itertools.chain.from_iterable(words))
-
-# Create a Pyphen object for English
 dic = pyphen.Pyphen(lang='en')
 def syllabify(word):
      return dic.inserted(word).split('-')
 
-# Apply syllabification to each word
-syllabified_words = [syllabify(word) for word in words]
-syllabified_words = list(itertools.chain.from_iterable(syllabified_words))
+def generateHaiku(length:int):
+    global alreadyChecked
+    for index, entry in enumerate(feed.entries[:100]):
+        if index in alreadyChecked:
+            continue
+        alreadyChecked.append(index)
+        line=[]
+        words = []
+        count = 0
+        done = False
+        words.append((entry.title).split())
+        words = list(itertools.chain.from_iterable(words))
+        #print(words)
+        for element in words:
+            count += syllables.estimate(element)
+            #print(count)
+            line.append(element)
+            if count == length:
+                print(' '.join(line))
+                done = True
+                break
+            else:
+                if count > length:
+                    count = 0
+                    line = []
+                    break
+                continue
+        if done:
+            break
 
-# Print the result
-print('Full List:',syllabified_words[:17])
-baked_data = "\n".join([
-    "Haiku:",
-    " ".join(syllabified_words[:5]),   # First line (5 syllables)
-    " ".join(syllabified_words[5:12]),  # Second line (7 syllables)
-    " ".join(syllabified_words[12:17])  # Third line (5 syllables)
-])
-
-print(baked_data)
+generateHaiku(5)
+generateHaiku(7)
+generateHaiku(5)
