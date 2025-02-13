@@ -1,0 +1,61 @@
+### Import required libraries
+import feedparser
+import itertools
+import syllables
+import requests
+
+### Parse the BBC news feed for data using an RSS link
+rss_url = "http://feeds.bbci.co.uk/news/rss.xml"
+feed = feedparser.parse(rss_url)
+alreadyChecked = []
+finalOutput = []
+
+### Define the function that will generate the haiku
+def generateHaiku(length:int):
+    global alreadyChecked
+    global finalOutput
+    ### If the input isn't an integer, throw an error and return
+    if not isinstance(length, int):
+        print("RETURNED: Please input an integer value.")
+        return
+    ### Loop for each entry in the BBC news feed
+    for index, entry in enumerate(feed.entries[:100]):
+        if index in alreadyChecked:
+            continue
+        alreadyChecked.append(index)
+        line=[]
+        words = []
+        count = 0
+        done = False
+        ### Create an array of every word in the title of the current entry, then format it using the list function
+        words.append((entry.summary).split())
+        words = list(itertools.chain.from_iterable(words))
+        ### For each word in the current entry's title, count the syllables and cut off after the target amount
+        for element in words:
+            count += syllables.estimate(element)
+            line.append(element)
+            ### If the title can be cleanly cut off after the target amount of syllables (i.e: it doesn't cut off mid-word), print it
+            ### NOTE: The 'syllables.estimate' function is inconsistent and may not count the number of syllables in a word properly
+            if count == length:
+                finalOutput.append(' '.join(line))
+                done = True
+                break
+            # Otherwise, abort and try again
+            else:
+                if count > length:
+                    count = 0
+                    line = []
+                    break
+                continue
+        if done:
+            break
+
+### Calling the function generates 1 line of the haiku, and you can designate the number of syllables using an integer input
+generateHaiku(5)
+generateHaiku(7)
+generateHaiku(5)
+
+### Print the final result
+webhook_url = "insert webhook url here"
+data = {"content": '\n'.join(['Generated Haiku:','```','\n'.join(finalOutput),'```'])}
+requests.post(webhook_url, json=data)
